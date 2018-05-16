@@ -51,6 +51,11 @@ namespace ContainerService.App.Messaging
 
 			await _shipRepository.CreateShip(receivedShip);
 
+			foreach (var container in receivedShip.Containers)
+			{
+				await _containerRepository.CreateContainerAsync(container);
+			}
+
 			await _containerRepository.UnloadContainersAsync(receivedShip.Containers);
 
 			await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, receivedShip);
@@ -69,6 +74,11 @@ namespace ContainerService.App.Messaging
 		private async Task<bool> HandleShipUndocked(string message)
 		{
 			var receivedShip = JsonSerializer.Deserialize<Ship>(message);
+
+			foreach (var container in receivedShip.Containers)
+			{
+				await _containerRepository.DeleteContainerAsync(container.Id);
+			}
 
 			await _shipRepository.DeleteShip(receivedShip.Id);
 
