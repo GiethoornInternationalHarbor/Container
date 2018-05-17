@@ -30,5 +30,10 @@ namespace ContainerService.Core.Models
 		/// The type of the product.
 		/// </value>
 		public ProductType ProductType { get; set; }
+
+		/// <summary>
+		/// Gets or sets the container zone.
+		/// </summary>
+		public ContainerZone ContainerZone { get; set; }
 	}
 }

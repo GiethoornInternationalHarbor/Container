@@ -1,6 +1,5 @@
 ﻿using ContainerService.Core.Models;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ContainerService.Core.Repositories
@@ -19,21 +18,21 @@ namespace ContainerService.Core.Repositories
 		/// </summary>
 		/// <param name="containers">The containers.</param>
 		/// <returns></returns>
-		Task<List<Container>> UnloadContainersAsync(List<Container> containers);
+		Task<Container> UnloadContainerAsync(Container container);
 
 		/// <summary>
 		/// Loads the containers asynchronous.
 		/// </summary>
 		/// <param name="containers">The containers.</param>
 		/// <returns></returns>
-		Task<List<Container>> LoadContainersAsync(List<Container> containers);
+		Task<Container> LoadContainerAsync(Container containers);
 
 		/// <summary>
 		/// Sorts the containers asynchronous.
 		/// </summary>
 		/// <param name="containers">The containers.</param>
 		/// <returns></returns>
-		Task<List<Container>> SortContainersAsync(List<Container> containers);
+		Task<Container> SortContainerAsync(Container containers);
 
 		/// <summary>
 		/// Deletes the container asynchronous.

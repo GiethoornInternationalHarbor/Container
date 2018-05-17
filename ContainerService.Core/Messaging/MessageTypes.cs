@@ -8,6 +8,7 @@
 		TruckArrived,
 		ServiceCompleted,
 		ShipContainerLoaded,
-		ShipContainerUnloaded
+		ShipContainerUnloaded,
+		ServiceRequested
 	}
 }

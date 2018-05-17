@@ -6,6 +6,13 @@ namespace ContainerService.Core.Repositories
 	public interface ITruckRepository
 	{
 		/// <summary>
+		/// Gets the truck.
+		/// </summary>
+		/// <param name="truck">The truck.</param>
+		/// <returns></returns>
+		Task<Truck> GetTruck(string plate);
+
+		/// <summary>
 		/// Creates the truck asynchronous.
 		/// </summary>
 		/// <param name="truck">The truck.</param>

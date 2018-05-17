@@ -3,7 +3,6 @@ using ContainerService.Core.Repositories;
 using ContainerService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ContainerService.Infrastructure.Repositories
@@ -31,19 +30,33 @@ namespace ContainerService.Infrastructure.Repositories
 			await _containerDbContext.SaveChangesAsync();
 		}
 
-		public async Task<List<Container>> LoadContainersAsync(List<Container> containers)
+		public async Task<Container> LoadContainerAsync(Container container)
 		{
-			return await Task.Run(() => containers);
+			return await Task.Run(() => container);
 		}
 
-		public async Task<List<Container>> SortContainersAsync(List<Container> containers)
+		public async Task<Container> SortContainerAsync(Container container)
 		{
-			return await Task.Run(() => containers);
+			switch (container.ProductType)
+			{
+				case ProductType.FreshProduceAndLivestock:
+					{
+						container.ContainerZone = ContainerZone.LiveStockAndFresh;
+						break;
+					}
+				case ProductType.Normal:
+					{
+						container.ContainerZone = ContainerZone.Normal;
+						break;
+					}
+			}
+
+			return await Task.Run(() => container);
 		}
 
-		public async Task<List<Container>> UnloadContainersAsync(List<Container> containers)
+		public async Task<Container> UnloadContainerAsync(Container container)
 		{
-			return await Task.Run(() => containers);
+			return await Task.Run(() => container);
 		}
 	}
 }

@@ -40,6 +40,10 @@ namespace ContainerService.App.Messaging
 					{
 						return await HandleTruckArrived(message);
 					}
+				case MessageTypes.ServiceRequested:
+					{
+						return await HandleServiceRequested(message);
+					}
 			}
 
 			return true;
@@ -55,18 +59,6 @@ namespace ContainerService.App.Messaging
 			{
 				await _containerRepository.CreateContainerAsync(container);
 			}
-
-			await _containerRepository.UnloadContainersAsync(receivedShip.Containers);
-
-			await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, receivedShip);
-
-			await _containerRepository.SortContainersAsync(receivedShip.Containers);
-
-			await _containerRepository.LoadContainersAsync(receivedShip.Containers);
-
-			await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, receivedShip);
-
-			await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, receivedShip.ShipService);
 
 			return true;
 		}
@@ -90,6 +82,36 @@ namespace ContainerService.App.Messaging
 			var receivedTruck = JsonSerializer.Deserialize<Truck>(message);
 
 			await _truckRepository.CreateTruckAsync(receivedTruck);
+
+			return true;
+		}
+
+		private async Task<bool> HandleServiceRequested(string message)
+		{
+			var receivedShipService = JsonSerializer.Deserialize<ShipService>(message);
+			var truck = await _truckRepository.GetTruck("");  // TODO: Truck Plate???
+
+			if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+			{
+				await _containerRepository.LoadContainerAsync(truck.Container);
+
+				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, truck);
+
+				await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, receivedShipService);
+
+				await _truckRepository.DeleteTruckAsync(truck.LicensePlate);
+			}
+
+			if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
+			{
+				await _containerRepository.UnloadContainerAsync(truck.Container);
+
+				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, truck);
+
+				await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, receivedShipService);
+
+				await _truckRepository.DeleteTruckAsync(truck.LicensePlate);
+			}
 
 			return true;
 		}
