@@ -97,9 +97,7 @@ namespace ContainerService.App.Messaging
 
 				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, truck);
 
-				await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, receivedShipService);
-
-				await _truckRepository.DeleteTruckAsync(truck.LicensePlate);
+				await PublishServiceCompleteAndDeleteTruck(receivedShipService, truck);
 			}
 
 			if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
@@ -108,10 +106,17 @@ namespace ContainerService.App.Messaging
 
 				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, truck);
 
-				await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, receivedShipService);
-
-				await _truckRepository.DeleteTruckAsync(truck.LicensePlate);
+				await PublishServiceCompleteAndDeleteTruck(receivedShipService, truck);
 			}
+
+			return true;
+		}
+
+		private async Task<bool> PublishServiceCompleteAndDeleteTruck(ShipService shipService, Truck truck)
+		{
+			await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, shipService);
+
+			await _truckRepository.DeleteTruckAsync(truck.LicensePlate);
 
 			return true;
 		}
