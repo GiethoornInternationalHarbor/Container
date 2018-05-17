@@ -28,5 +28,10 @@ namespace ContainerService.Infrastructure.Repositories
 			_containerDbContext.Entry(truckToDelete).State = EntityState.Deleted;
 			await _containerDbContext.SaveChangesAsync();
 		}
+
+		public Task<Truck> GetTruck(string plate)
+		{
+			return _containerDbContext.Trucks.LastOrDefaultAsync(x => x.LicensePlate == plate);
+		}
 	}
 }
