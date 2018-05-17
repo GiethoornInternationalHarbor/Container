@@ -2,6 +2,8 @@
 using ContainerService.Core.Repositories;
 using ContainerService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ContainerService.Infrastructure.Repositories
@@ -32,6 +34,11 @@ namespace ContainerService.Infrastructure.Repositories
 		public Task<Truck> GetTruck(string plate)
 		{
 			return _containerDbContext.Trucks.LastOrDefaultAsync(x => x.LicensePlate == plate);
+		}
+
+		public Task<List<Truck>> GetTrucks()
+		{
+			return _containerDbContext.Trucks.Where(x => x.Container == null).ToListAsync();
 		}
 	}
 }

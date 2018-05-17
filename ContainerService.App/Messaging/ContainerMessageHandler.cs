@@ -1,6 +1,7 @@
 ﻿using ContainerService.Core.Messaging;
 using ContainerService.Core.Models;
 using ContainerService.Core.Repositories;
+using System.Linq;
 using System.Threading.Tasks;
 using Utf8Json;
 
@@ -89,24 +90,29 @@ namespace ContainerService.App.Messaging
 		private async Task<bool> HandleServiceRequested(string message)
 		{
 			var receivedShipService = JsonSerializer.Deserialize<ShipService>(message);
-			var truck = await _truckRepository.GetTruck("");  // TODO: Truck Plate???
+			var trucks = await _truckRepository.GetTrucks();
 
-			if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+			var selectedTruck = trucks?.FirstOrDefault();
+
+			if (selectedTruck != null)
 			{
-				await _containerRepository.LoadContainerAsync(truck.Container);
+				if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+				{
+					await _containerRepository.LoadContainerAsync(selectedTruck.Container);
 
-				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, truck);
+					await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, selectedTruck);
 
-				await PublishServiceCompleteAndDeleteTruck(receivedShipService, truck);
-			}
+					await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+				}
 
-			if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
-			{
-				await _containerRepository.UnloadContainerAsync(truck.Container);
+				if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
+				{
+					await _containerRepository.UnloadContainerAsync(selectedTruck.Container);
 
-				await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, truck);
+					await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, selectedTruck);
 
-				await PublishServiceCompleteAndDeleteTruck(receivedShipService, truck);
+					await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+				}
 			}
 
 			return true;

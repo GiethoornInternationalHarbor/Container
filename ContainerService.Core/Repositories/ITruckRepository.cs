@@ -1,4 +1,5 @@
 ﻿using ContainerService.Core.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ContainerService.Core.Repositories
@@ -11,6 +12,12 @@ namespace ContainerService.Core.Repositories
 		/// <param name="truck">The truck.</param>
 		/// <returns></returns>
 		Task<Truck> GetTruck(string plate);
+
+		/// <summary>
+		/// Gets the trucks.
+		/// </summary>
+		/// <returns></returns>
+		Task<List<Truck>> GetTrucks();
 
 		/// <summary>
 		/// Creates the truck asynchronous.
