@@ -38,7 +38,7 @@ namespace ContainerService.Infrastructure.Repositories
 
 		public async Task<Container[]> SortContainersAsync(Container[] containers)
 		{
-			containers.OrderByDescending(x => (int)(x.ProductType)).ToArray();
+			containers.OrderBy(x => (int)(x.ProductType)).ToArray();
 
 			return await Task.Run(() => containers);
 		}
