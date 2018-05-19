@@ -32,7 +32,7 @@ namespace ContainerService.Core.Repositories
 		/// </summary>
 		/// <param name="containers">The containers.</param>
 		/// <returns></returns>
-		Task<Container> SortContainerAsync(Container containers);
+		Task<Container[]> SortContainersAsync(Container[] containers);
 
 		/// <summary>
 		/// Deletes the container asynchronous.

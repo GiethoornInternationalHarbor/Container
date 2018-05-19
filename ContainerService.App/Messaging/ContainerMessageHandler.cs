@@ -92,26 +92,33 @@ namespace ContainerService.App.Messaging
 			var receivedShipService = JsonSerializer.Deserialize<ShipService>(message);
 			var trucks = await _truckRepository.GetTrucks();
 
-			var selectedTruck = trucks?.FirstOrDefault();
+			var containersToSort = trucks.Select(x => x.Container).ToArray();
 
-			if (selectedTruck != null)
+			await _containerRepository.SortContainersAsync(containersToSort);	
+
+			foreach (var truck in trucks)
 			{
-				if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+				var selectedTruck = trucks?.FirstOrDefault();
+
+				if (selectedTruck != null)
 				{
-					await _containerRepository.LoadContainerAsync(selectedTruck.Container);
+					if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+					{
+						await _containerRepository.LoadContainerAsync(selectedTruck.Container);
 
-					await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, selectedTruck);
+						await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, selectedTruck);
 
-					await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
-				}
+						await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+					}
 
-				if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
-				{
-					await _containerRepository.UnloadContainerAsync(selectedTruck.Container);
+					if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
+					{
+						await _containerRepository.UnloadContainerAsync(selectedTruck.Container);
 
-					await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, selectedTruck);
+						await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, selectedTruck);
 
-					await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+						await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+					}
 				}
 			}
 

@@ -4,6 +4,7 @@ using ContainerService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ContainerService.Infrastructure.Repositories
 {
@@ -35,23 +36,11 @@ namespace ContainerService.Infrastructure.Repositories
 			return await Task.Run(() => container);
 		}
 
-		public async Task<Container> SortContainerAsync(Container container)
+		public async Task<Container[]> SortContainersAsync(Container[] containers)
 		{
-			switch (container.ProductType)
-			{
-				case ProductType.FreshProduceAndLivestock:
-					{
-						container.ContainerZone = ContainerZone.LiveStockAndFresh;
-						break;
-					}
-				case ProductType.Normal:
-					{
-						container.ContainerZone = ContainerZone.Normal;
-						break;
-					}
-			}
+			containers.OrderBy(x => x.ProductType == ProductType.FreshProduceAndLivestock);
 
-			return await Task.Run(() => container);
+			return await Task.Run(() => containers);
 		}
 
 		public async Task<Container> UnloadContainerAsync(Container container)

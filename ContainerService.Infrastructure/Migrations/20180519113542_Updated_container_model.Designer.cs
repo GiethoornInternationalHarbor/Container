@@ -12,9 +12,10 @@ using System;
 namespace ContainerService.Infrastructure.Migrations
 {
     [DbContext(typeof(ContainerDbContext))]
-    partial class ContainerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180519113542_Updated_container_model")]
+    partial class Updated_container_model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
