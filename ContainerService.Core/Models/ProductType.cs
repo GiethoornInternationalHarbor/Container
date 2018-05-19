@@ -2,7 +2,7 @@
 {
 	public enum ProductType
 	{
-		FreshProduceAndLivestock,
-		Normal
+		FreshProduceAndLivestock = 1,
+		Normal = 2
 	}
 }
