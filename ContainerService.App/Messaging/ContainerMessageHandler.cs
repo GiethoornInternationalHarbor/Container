@@ -1,6 +1,7 @@
 ﻿using ContainerService.Core.Messaging;
 using ContainerService.Core.Models;
 using ContainerService.Core.Repositories;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Utf8Json;
@@ -90,34 +91,39 @@ namespace ContainerService.App.Messaging
 		private async Task<bool> HandleServiceRequested(string message)
 		{
 			var receivedShipService = JsonSerializer.Deserialize<ShipService>(message);
-			var trucks = await _truckRepository.GetTrucks();
+			var ship = await _shipRepository.GetShip(receivedShipService.ShipId);
 
-			var containersToSort = trucks.Select(x => x.Container).ToArray();
-
-			await _containerRepository.SortContainersAsync(containersToSort);	
-
-			foreach (var truck in trucks)
+			if (ship != null)
 			{
-				var selectedTruck = trucks?.FirstOrDefault();
+				var trucks = await _truckRepository.GetTrucks();
 
-				if (selectedTruck != null)
+				var containersToSort = trucks.Select(x => x.Container).ToArray();
+
+				await _containerRepository.SortContainersAsync(containersToSort);
+
+				foreach (var truck in trucks)
 				{
-					if (receivedShipService.Id == ShipServiceConstants.LoadContainerId)
+					var selectedTruck = trucks?.FirstOrDefault();
+
+					if (selectedTruck != null)
 					{
-						await _containerRepository.LoadContainerAsync(selectedTruck.Container);
+						if (receivedShipService.ServiceId == ShipServiceConstants.LoadContainerId)
+						{
+							await _containerRepository.LoadContainerAsync(selectedTruck.Container);
 
-						await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, selectedTruck);
+							await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerLoaded, selectedTruck);
 
-						await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
-					}
+							await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+						}
 
-					if (receivedShipService.Id == ShipServiceConstants.UnloadContainerId)
-					{
-						await _containerRepository.UnloadContainerAsync(selectedTruck.Container);
+						if (receivedShipService.ServiceId == ShipServiceConstants.UnloadContainerId)
+						{
+							await _containerRepository.UnloadContainerAsync(selectedTruck.Container);
 
-						await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, selectedTruck);
+							await _messagePublisher.PublishMessageAsync(MessageTypes.ShipContainerUnloaded, selectedTruck);
 
-						await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+							await PublishServiceCompleteAndDeleteTruck(receivedShipService, selectedTruck);
+						}
 					}
 				}
 			}

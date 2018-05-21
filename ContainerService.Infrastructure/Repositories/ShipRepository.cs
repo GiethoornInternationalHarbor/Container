@@ -29,5 +29,10 @@ namespace ContainerService.Infrastructure.Repositories
 			_containerDbContext.Entry(shipToDelete).State = EntityState.Deleted;
 			await _containerDbContext.SaveChangesAsync();
 		}
+
+		public Task<Ship> GetShip(Guid id)
+		{
+			return _containerDbContext.Ships.LastOrDefaultAsync(x => x.Id == id);
+		}
 	}
 }

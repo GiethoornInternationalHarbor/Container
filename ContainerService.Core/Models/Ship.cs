@@ -22,10 +22,5 @@ namespace ContainerService.Core.Models
 		/// Gets or sets the containers.
 		/// </summary>
 		public List<Container> Containers { get; set; }
-
-		/// <summary>
-		/// Gets or sets the ship service.
-		/// </summary>
-		public ShipService ShipService { get; set; }
 	}
 }
