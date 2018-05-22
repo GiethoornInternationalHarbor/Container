@@ -10,7 +10,7 @@ namespace ContainerService.Infrastructure.Database
 		public ContainerDbContext CreateDbContext(string[] args)
 		{
 			var optBuilder = new DbContextOptionsBuilder<ContainerDbContext>();
-			optBuilder.UseSqlServer("Server=.\\SQL_2017;Database=InvoiceService;Trusted_Connection=True;MultipleActiveResultSets=true");
+			optBuilder.UseSqlServer("Server=.\\SQL_2017;Database=ContainerService;Trusted_Connection=True;MultipleActiveResultSets=true");
 
 			return new ContainerDbContext(optBuilder.Options);
 		}
