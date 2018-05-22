@@ -6,6 +6,11 @@ namespace ContainerService.Core.Models
 	public class ShipService
 	{
 		/// <summary>
+		/// Gets or sets the customer identifier.
+		/// </summary>
+		public string CustomerId { get; set; }
+
+		/// <summary>
 		/// Gets or sets the identifier.
 		/// </summary>
 		[Key]
