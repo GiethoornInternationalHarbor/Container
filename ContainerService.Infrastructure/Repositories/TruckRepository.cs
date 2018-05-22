@@ -10,35 +10,39 @@ namespace ContainerService.Infrastructure.Repositories
 {
 	public class TruckRepository : ITruckRepository
 	{
-		private readonly ContainerDbContext _containerDbContext;
+		private readonly ContainerDbContextFactory _containerDbContextFactory;
 
-		public TruckRepository(ContainerDbContext containerDbContext)
+		public TruckRepository(ContainerDbContextFactory containerDbContextFactory)
 		{
-			_containerDbContext = containerDbContext;
+			_containerDbContextFactory = containerDbContextFactory;
 		}
 
 		public async Task<Truck> CreateTruckAsync(Truck truck)
 		{
-			var truckToAdd = (await _containerDbContext.Trucks.AddAsync(truck)).Entity;
-			await _containerDbContext.SaveChangesAsync();
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			var truckToAdd = (await dbContext.Trucks.AddAsync(truck)).Entity;
+			await dbContext.SaveChangesAsync();
 			return truckToAdd;
 		}
 
 		public async Task DeleteTruckAsync(string plate)
 		{
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
 			var truckToDelete = new Truck() { LicensePlate = plate };
-			_containerDbContext.Entry(truckToDelete).State = EntityState.Deleted;
-			await _containerDbContext.SaveChangesAsync();
+			dbContext.Entry(truckToDelete).State = EntityState.Deleted;
+			await dbContext.SaveChangesAsync();
 		}
 
 		public Task<Truck> GetTruck(string plate)
 		{
-			return _containerDbContext.Trucks.LastOrDefaultAsync(x => x.LicensePlate == plate);
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			return dbContext.Trucks.LastOrDefaultAsync(x => x.LicensePlate == plate);
 		}
 
 		public Task<List<Truck>> GetTrucks()
 		{
-			return _containerDbContext.Trucks.Where(x => x.Container == null).ToListAsync();
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			return dbContext.Trucks.Where(x => x.Container == null).ToListAsync();
 		}
 	}
 }

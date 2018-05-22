@@ -9,30 +9,33 @@ namespace ContainerService.Infrastructure.Repositories
 {
 	public class ShipRepository : IShipRepository
 	{
-		private readonly ContainerDbContext _containerDbContext;
+		private readonly ContainerDbContextFactory _containerDbContextFactory;
 
-		public ShipRepository(ContainerDbContext containerDbContext)
+		public ShipRepository(ContainerDbContextFactory containerDbContextFactory)
 		{
-			_containerDbContext = containerDbContext;
+			_containerDbContextFactory = containerDbContextFactory;
 		}
 
 		public async Task<Ship> CreateShip(Ship ship)
 		{
-			var shipToAdd = (await _containerDbContext.Ships.AddAsync(ship)).Entity;
-			await _containerDbContext.SaveChangesAsync();
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			var shipToAdd = (await dbContext.Ships.AddAsync(ship)).Entity;
+			await dbContext.SaveChangesAsync();
 			return shipToAdd;
 		}
 
 		public async Task DeleteShip(Guid id)
 		{
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
 			var shipToDelete = new Ship() { Id = id };
-			_containerDbContext.Entry(shipToDelete).State = EntityState.Deleted;
-			await _containerDbContext.SaveChangesAsync();
+			dbContext.Entry(shipToDelete).State = EntityState.Deleted;
+			await dbContext.SaveChangesAsync();
 		}
 
 		public Task<Ship> GetShip(Guid id)
 		{
-			return _containerDbContext.Ships.LastOrDefaultAsync(x => x.Id == id);
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			return dbContext.Ships.LastOrDefaultAsync(x => x.Id == id);
 		}
 	}
 }
