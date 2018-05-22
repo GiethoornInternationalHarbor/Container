@@ -10,25 +10,27 @@ namespace ContainerService.Infrastructure.Repositories
 {
 	public class ContainerRepository : IContainerRepository
 	{
-		private readonly ContainerDbContext _containerDbContext;
+		private readonly ContainerDbContextFactory _containerDbContextFactory;
 
-		public ContainerRepository(ContainerDbContext containerDbContext)
+		public ContainerRepository(ContainerDbContextFactory containerDbContextFactory)
 		{
-			_containerDbContext = containerDbContext;
+			_containerDbContextFactory = containerDbContextFactory;
 		}
 
 		public async Task<Container> CreateContainerAsync(Container container)
 		{
-			var containerToAdd = (await _containerDbContext.Containers.AddAsync(container)).Entity;
-			await _containerDbContext.SaveChangesAsync();
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			var containerToAdd = (await dbContext.Containers.AddAsync(container)).Entity;
+			await dbContext.SaveChangesAsync();
 			return containerToAdd;
 		}
 
 		public async Task DeleteContainerAsync(Guid id)
 		{
-			var shipToDelete = new Core.Models.Container() { Id = id };
-			_containerDbContext.Entry(shipToDelete).State = EntityState.Deleted;
-			await _containerDbContext.SaveChangesAsync();
+			ContainerDbContext dbContext = _containerDbContextFactory.CreateDbContext();
+			var shipToDelete = new Container() { Id = id };
+			dbContext.Entry(shipToDelete).State = EntityState.Deleted;
+			await dbContext.SaveChangesAsync();
 		}
 
 		public async Task<Container> LoadContainerAsync(Container container)
