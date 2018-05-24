@@ -14,9 +14,12 @@ namespace ContainerService.Core.Models
 		public Guid Id { get; set; }
 
 		/// <summary>
-		/// Gets or sets the email.
+		/// Gets or sets the customer identifier.
 		/// </summary>
-		public string Email { get; set; }
+		/// <value>
+		/// The customer identifier.
+		/// </value>
+		public Guid CustomerId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the containers.

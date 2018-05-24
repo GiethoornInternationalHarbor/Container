@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ContainerService.Core.Models
 {
-	public class ShipService
+	public struct ServiceRequest
 	{
 		/// <summary>
 		/// Gets or sets the customer identifier.
 		/// </summary>
-		public string CustomerId { get; set; }
+		public Guid CustomerId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the identifier.
