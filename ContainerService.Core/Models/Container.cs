@@ -24,11 +24,8 @@ namespace ContainerService.Core.Models
 		public List<Product> Products { get; set; }
 
 		/// <summary>
-		/// Gets or sets the type of the product.
+		/// Gets or sets the type of the container.
 		/// </summary>
-		/// <value>
-		/// The type of the product.
-		/// </value>
-		public ProductType ProductType { get; set; }
+		public ContainerType ContainerType { get; set; }
 	}
 }

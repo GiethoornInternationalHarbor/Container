@@ -53,11 +53,18 @@ namespace ContainerService.App.Messaging
 
 		private async Task<bool> HandleShipDocked(string message)
 		{
-			var receivedShip = JsonSerializer.Deserialize<Ship>(message);
+			var receivedShip = JsonSerializer.Deserialize<ShipDockedEventModel>(message);
 
-			await _shipRepository.CreateShip(receivedShip);
+			Ship ship = new Ship()
+			{
+				Containers = receivedShip.Containers,
+				CustomerId = receivedShip.CustomerId,
+				Id = receivedShip.ShipId
+			};
 
-			foreach (var container in receivedShip.Containers)
+			Ship createdShip = await _shipRepository.CreateShip(ship);
+
+			foreach (var container in createdShip.Containers)
 			{
 				await _containerRepository.CreateContainerAsync(container);
 			}
@@ -67,14 +74,20 @@ namespace ContainerService.App.Messaging
 
 		private async Task<bool> HandleShipUndocked(string message)
 		{
-			var receivedShip = JsonSerializer.Deserialize<Ship>(message);
+			var receivedShip = JsonSerializer.Deserialize<ShipDockedEventModel>(message);
 
-			foreach (var container in receivedShip.Containers)
+			Ship ship = new Ship()
+			{
+				Containers = receivedShip.Containers,
+				Id = receivedShip.ShipId
+			};
+
+			foreach (var container in ship.Containers)
 			{
 				await _containerRepository.DeleteContainerAsync(container.Id);
 			}
 
-			await _shipRepository.DeleteShip(receivedShip.Id);
+			await _shipRepository.DeleteShip(ship.Id);
 
 			return true;
 		}
@@ -90,7 +103,7 @@ namespace ContainerService.App.Messaging
 
 		private async Task<bool> HandleServiceRequested(string message)
 		{
-			var receivedShipService = JsonSerializer.Deserialize<ShipService>(message);
+			var receivedShipService = JsonSerializer.Deserialize<ServiceRequest>(message);
 			var ship = await _shipRepository.GetShip(receivedShipService.ShipId);
 
 			if (ship != null)
@@ -131,7 +144,7 @@ namespace ContainerService.App.Messaging
 			return true;
 		}
 
-		private async Task<bool> PublishServiceCompleteAndDeleteTruck(ShipService shipService, Truck truck)
+		private async Task<bool> PublishServiceCompleteAndDeleteTruck(ServiceRequest shipService, Truck truck)
 		{
 			await _messagePublisher.PublishMessageAsync(MessageTypes.ServiceCompleted, shipService);
 
